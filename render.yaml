@@ -19,6 +19,8 @@ services:
         sync: false
       - key: CLIENT_URL
         sync: false
+      - key: API_URL
+        value: https://doctor-tracker-backend-gfj8.onrender.com/api
       - key: SEED_ON_START
         value: true
       - key: SEED_ADMIN_NAME

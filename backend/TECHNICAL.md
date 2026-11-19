@@ -6,7 +6,7 @@ Fastify application entry (`server.js`) establishes Mongoose before accepting tr
 
 ## Schemas
 
-- **User:** name, email, passwordHash, role (`ADMIN`|`VIEWER`), isActive, timestamps. PasswordHash is excluded by `select: false`.
+- **User:** name, email, passwordHash, role (`ADMIN`|`VIEWER`), isActive, timestamps. PasswordHash is excluded by `select: false`. User management is restricted to ADMIN and audits create/update/delete operations.
 - **Doctor:** name, specialization, hospital, phone, unique email, createdBy, updatedBy, timestamps.
 - **Patient:** name, age, gender, phone, optional email, condition, required doctorId reference, createdBy, updatedBy, timestamps.
 - **AuditLog:** actor snapshot and ID, action, entity type/ID, summary, changed fields, limited metadata, IP, user agent and createdAt.
@@ -51,3 +51,7 @@ Monitor text index cardinality and maintain compound indexes for common dashboar
 ## CORS integration
 
 The Fastify CORS plugin reads the exact allowed origins from `CLIENT_URL` and supports comma-separated origins. Production deployments must set an explicit origin and must not use a wildcard. Preflight `OPTIONS` requests are handled for `GET`, `POST`, `PUT`, `PATCH`, `DELETE`, and `OPTIONS`, with `Content-Type` and `Authorization` allowed headers. The backend route prefix is `/api`; frontend API bases should therefore end in `/api`, while service endpoints begin with resource paths such as `/auth/login` or `/doctors`.
+
+## Swagger documentation
+
+Swagger reads `API_URL` at application startup. This public API base controls the OpenAPI `servers` entry, allowing `/api/docs` to execute requests against the deployed backend. Local fallback is `http://localhost:<PORT>`; production deployment should set `API_URL=https://doctor-tracker-backend-gfj8.onrender.com/api`.

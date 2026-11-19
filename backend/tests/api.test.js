@@ -78,3 +78,24 @@ test('CORS rejects origins outside the configured allowlist', async () => {
   assert.equal(response.statusCode, 403);
   await app.close();
 });
+
+test('Swagger exposes the configured public server URL', async () => {
+  const app = buildApp({ env: {
+    NODE_ENV: 'test', PORT: 5000,
+    MONGODB_URI: 'mongodb://127.0.0.1:27017/doctor_tracker_test',
+    JWT_SECRET: 'test-secret-with-at-least-thirty-two-bytes',
+    JWT_EXPIRES_IN: '1h', CLIENT_URL: 'http://localhost:3000',
+    API_URL: 'https://doctor-tracker-backend-gfj8.onrender.com/api'
+  } });
+  const response = await app.inject({ method: 'GET', url: '/api/docs/json' });
+  assert.equal(response.statusCode, 200);
+  assert.equal(response.json().servers[0].url, 'https://doctor-tracker-backend-gfj8.onrender.com');
+  await app.close();
+});
+
+test('user management routes require authentication and ADMIN RBAC', async () => {
+  const app = appWithEnv();
+  const response = await app.inject({ method: 'GET', url: '/api/users' });
+  assert.equal(response.statusCode, 401);
+  await app.close();
+});

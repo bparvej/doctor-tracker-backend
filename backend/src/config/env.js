@@ -1,4 +1,4 @@
-const requiredInProduction = ['MONGODB_URI', 'JWT_SECRET', 'CLIENT_URL'];
+const requiredInProduction = ['MONGODB_URI', 'JWT_SECRET', 'CLIENT_URL', 'API_URL'];
 
 function loadEnv() {
   const env = {
@@ -7,7 +7,8 @@ function loadEnv() {
     MONGODB_URI: process.env.MONGODB_URI,
     JWT_SECRET: process.env.JWT_SECRET,
     JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || '1d',
-    CLIENT_URL: process.env.CLIENT_URL || 'http://localhost:3000'
+    CLIENT_URL: process.env.CLIENT_URL || 'http://localhost:3000',
+    API_URL: process.env.API_URL
   };
   if (env.NODE_ENV === 'production') {
     const missing = requiredInProduction.filter((key) => !env[key]);

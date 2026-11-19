@@ -95,3 +95,17 @@ CLIENT_URL=https://doctor-tracker-frontend-sandy.vercel.app,http://localhost:300
 ```
 
 Do not use `*` for production CORS. Allowed methods are `GET`, `POST`, `PUT`, `PATCH`, `DELETE`, and `OPTIONS`; allowed headers are `Content-Type` and `Authorization`. The API base URL is `/api`, so request paths must include `/api` only once, such as `/api/auth/login`.
+
+## Swagger and public server URL
+
+Set `API_URL` to the deployed public API base. Include `/api` when Swagger should execute routes through that base:
+
+```text
+API_URL=https://doctor-tracker-backend-gfj8.onrender.com/api
+```
+
+Locally, `API_URL=http://localhost:5000/api`. The Swagger configuration derives the server origin and route operations remain `/api/...`.
+
+## User management and RBAC
+
+`/api/users` is protected by authentication and the `ADMIN` role. `ADMIN` users can create, list, view, update and delete users. The API prevents an admin from deleting or deactivating their own account and prevents self role changes. `VIEWER` users may remain read-only and cannot access mutation or administration routes.
