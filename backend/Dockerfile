@@ -2,11 +2,11 @@
 
 WORKDIR /app
 
-COPY package.json package-lock.json* ./
+COPY backend/package.json backend/package-lock.json* ./
 
-RUN npm install --omit=dev
+RUN npm ci --omit=dev
 
-COPY . .
+COPY backend/ .
 
 EXPOSE 5000
 ENV NODE_ENV=production
