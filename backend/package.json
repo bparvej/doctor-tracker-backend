@@ -12,16 +12,18 @@
     "seed:demo": "node scripts/seed-demo.js"
   },
   "dependencies": {
-    "@fastify/cors": "^11.1.0",
-    "@fastify/helmet": "^13.0.2",
-    "@fastify/jwt": "^10.0.0",
-    "@fastify/rate-limit": "^10.3.0",
-    "@fastify/swagger": "^9.5.2",
-    "@fastify/swagger-ui": "^5.2.3",
     "bcrypt": "^6.0.0",
+    "cors": "^2.8.6",
     "dotenv": "^17.2.3",
-    "fastify": "^5.6.2",
-    "mongoose": "^8.19.1"
+    "express": "^5.3.0",
+    "express-rate-limit": "^8.7.5",
+    "helmet": "^8.3.0",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^8.19.1",
+    "supertest": "^7.3.2",
+    "swagger-ui-express": "^5.0.1"
   },
-  "engines": { "node": ">=20" }
+  "engines": {
+    "node": ">=20"
+  }
 }

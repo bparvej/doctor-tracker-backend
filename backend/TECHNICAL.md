@@ -2,7 +2,7 @@
 
 ## Architecture
 
-Fastify application entry (`server.js`) establishes Mongoose before accepting traffic. `src/app.js` composes plugins and module routes. Modules separate routes, controllers, services and Mongoose models. Centralized error handling converts validation, JWT, cast, duplicate-key and application errors into a consistent JSON response.
+Express application entry (`server.js`) establishes Mongoose before accepting traffic. `src/app.js` composes Helmet, CORS, rate limiting, JSON parsing, route modules, Swagger UI, and centralized Express error handling. Modules separate routes, controllers, services, and Mongoose models. The Express error middleware maps validation, malformed ObjectIds, duplicate keys, JWT failures, and application errors into the existing JSON response contract.
 
 ## Schemas
 
@@ -15,15 +15,15 @@ Deletion policy: a doctor cannot be deleted while associated patients exist. The
 
 ## Authentication
 
-Bearer JWTs are used. Tokens contain only the subject and role. Every protected request verifies the token, reloads the current user, rejects inactive/deleted users and verifies the token role matches the database role. Tokens are never stored or placed in audit metadata. Logout is an audit event, not token revocation; clients must discard the token.
+Bearer JWTs are created and verified with `jsonwebtoken`. Tokens contain only subject and role. Every protected request verifies the token, reloads the current user, rejects inactive/deleted users, and verifies the token role matches the database role. Logout is an audit event, not token revocation; clients must discard the token.
 
 ## Authorization
 
-Routes derive actor identity from `request.user.sub`, never body fields. Mutations require ADMIN; read routes are authenticated. VIEWER is a valid role and has read access where no mutation requirement is declared.
+Express middleware derives actor identity from `req.user.sub`, never body fields. Mutations require ADMIN; read routes are authenticated. VIEWER is valid and has read access where no mutation requirement is declared.
 
 ## Audit design
 
-Audit entries are generated in service/controller business operations and are never publicly writable. Audit mutation hooks reject updates and deletes. Critical operations can use `runWithFallback`: transaction writes are attempted on replica sets and should include business and audit writes; a documented fallback may use best-effort sequential writes on standalone MongoDB. Standalone deployments cannot provide an atomic cross-document guarantee.
+Audit entries are generated in business controllers/services and are never publicly writable. Audit mutation hooks reject updates and deletes. Standalone MongoDB deployments cannot provide a cross-document atomic guarantee; replica-set transactions remain the preferred consistency mechanism.
 
 ## Indexes
 
@@ -31,27 +31,21 @@ Doctors: text name/specialization/hospital, createdAt, specialization/hospital/c
 
 ## Query design
 
-Listing endpoints use bounded limits (maximum 100), skip/limit pagination and projected/lean reads where possible. Search uses MongoDB text indexes, while exact categorical filters use indexed fields. Aggregation uses server-side `$group`, `$lookup`, `$sort` and `$limit`.
+Listing endpoints use bounded limits (maximum 100), skip/limit pagination, and lean reads where possible. Search uses MongoDB text indexes, exact categorical filters use indexed fields, and dashboard aggregation uses server-side `$group`, `$lookup`, `$sort`, `$limit`, and `$project`.
 
 ## Error handling
 
-The Fastify centralized handler maps validation, malformed ObjectIds, duplicate keys, JWT failures and application errors. Production responses omit internal stack traces and database details.
+The Express centralized error middleware maps malformed JSON, validation failures, malformed ObjectIds, duplicate keys, JWT failures, and application errors. Production responses omit internal stack traces and database details.
 
 ## Technical decisions
 
-1. **Fastify over Express:** lower framework overhead, native schema validation and typed plugin lifecycle.
-2. **Bearer JWT:** stateless scaling and simple separate-frontend integration; logout is client-side plus audit-only.
-3. **Text indexes plus exact filters:** supports user-friendly search without loading collections into memory.
-4. **Mongoose lean reads:** reduces hydration overhead for list responses.
-
-## Performance considerations
-
-Monitor text index cardinality and maintain compound indexes for common dashboard and audit filters. Consider cursor pagination for very large histories. Dashboard count and aggregation endpoints can use MongoDB and should be cached if traffic increases.
+1. **MongoDB indexing and aggregation:** compound/text indexes support doctor and patient search, while dashboard aggregation runs on MongoDB instead of loading full collections into memory.
+2. **Stateless JWT plus RBAC:** `jsonwebtoken` provides stateless authentication and database role/status revalidation preserves account revocation behavior. Immutable audit logging records privileged and authentication events.
 
 ## CORS integration
 
-The Fastify CORS plugin reads the exact allowed origins from `CLIENT_URL` and supports comma-separated origins. Production deployments must set an explicit origin and must not use a wildcard. Preflight `OPTIONS` requests are handled for `GET`, `POST`, `PUT`, `PATCH`, `DELETE`, and `OPTIONS`, with `Content-Type` and `Authorization` allowed headers. The backend route prefix is `/api`; frontend API bases should therefore end in `/api`, while service endpoints begin with resource paths such as `/auth/login` or `/doctors`.
+The Express CORS middleware reads exact allowed origins from `CLIENT_URL` and supports comma-separated origins. Production deployments must set an explicit origin and must not use a wildcard. Preflight `OPTIONS` requests are handled for `GET`, `POST`, `PUT`, `PATCH`, `DELETE`, and `OPTIONS`, with `Content-Type` and `Authorization` allowed headers.
 
-## Swagger documentation
+## Swagger and public endpoints
 
-Swagger reads `API_URL`, then `PUBLIC_API_URL`, then Render's `RENDER_EXTERNAL_URL` at application startup. This public API base controls the OpenAPI `servers` entry, allowing `/api/docs` to execute requests against the deployed backend. Local fallback is `http://localhost:<PORT>`; production deployment should set `API_URL=https://doctor-tracker-backend-gfj8.onrender.com/api`. No database migration is needed for the existing role enum or user-management fields.
+Swagger reads `API_URL`, then `PUBLIC_API_URL`, then Render's `RENDER_EXTERNAL_URL`. The canonical URLs are `/api/docs` and `/api/docs/json`; public aliases are `/docs` and `/docs/json`. Health is available at `/api/health` and `/health`.

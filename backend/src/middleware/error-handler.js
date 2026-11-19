@@ -8,17 +8,14 @@ function appError(statusCode, message, code = 'APP_ERROR', details) {
   return error;
 }
 
-function errorHandler(error, request, reply) {
-  request.log.error({ err: error, requestId: request.id }, 'Request failed');
-  let statusCode = error.statusCode || error.statusCode === 0 ? error.statusCode : 500;
+function errorHandler(error, req, res, next) {
+  let statusCode = error.statusCode !== undefined ? error.statusCode : 500;
   let code = error.code || 'INTERNAL_ERROR';
   let message = 'An unexpected error occurred';
 
-  if (error.validation) {
-    statusCode = 400;
-    code = 'VALIDATION_ERROR';
-    message = 'Request validation failed';
-  } else if (error.name === 'JsonWebTokenError' || error.code === 'FST_JWT_BAD_REQUEST') {
+  if (error.type === 'entity.parse.failed') {
+    statusCode = 400; code = 'VALIDATION_ERROR'; message = 'Request validation failed';
+  } else if (error.name === 'JsonWebTokenError') {
     statusCode = 401; code = 'INVALID_TOKEN'; message = 'Invalid authentication token';
   } else if (error.name === 'TokenExpiredError') {
     statusCode = 401; code = 'TOKEN_EXPIRED'; message = 'Authentication token has expired';
@@ -30,10 +27,12 @@ function errorHandler(error, request, reply) {
     message = error.message;
   }
 
-  return reply.code(statusCode).send({
+  if (statusCode >= 500) console.error(error);
+  const requestId = req.headers['x-request-id'] || req.id || null;
+  return res.status(statusCode).json({
     success: false,
     error: { code, message, ...(error.details ? { details: error.details } : {}) },
-    requestId: request.id
+    ...(requestId ? { requestId } : {})
   });
 }
 module.exports = { appError, errorHandler };

@@ -1,7 +1,7 @@
 const Doctor = require('../doctors/doctor.model');
 const Patient = require('../patients/patient.model');
 
-async function stats(request, reply) {
+async function stats(req, res, next) {
   try {
     const [doctors, patients, patientsPerDoctor, recentDoctors, recentPatients] = await Promise.all([
       Doctor.countDocuments(),
@@ -10,7 +10,7 @@ async function stats(request, reply) {
       Doctor.find().sort({ createdAt: -1 }).limit(5).select('name specialization hospital createdAt').lean(),
       Patient.find().sort({ createdAt: -1 }).limit(5).select('name condition doctorId createdAt').populate('doctorId', 'name').lean()
     ]);
-    return reply.send({ success: true, data: { totalDoctors: doctors, totalPatients: patients, patientsPerDoctor, recent: { doctors: recentDoctors, patients: recentPatients } } });
-  } catch (error) { throw error; }
+    return res.status(200).json({ success: true, data: { totalDoctors: doctors, totalPatients: patients, patientsPerDoctor, recent: { doctors: recentDoctors, patients: recentPatients } } });
+  } catch (error) { next(error); }
 }
 module.exports = { stats };

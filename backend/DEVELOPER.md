@@ -28,7 +28,7 @@ cd backend && npm run seed:admin
 
 Set seed credentials in `backend/.env` when not using compose.
 
-`npm start`, `npm run dev`, and Docker startup run the idempotent demo seeder before launching Fastify. Existing demo records are not replaced. Seeded demo credentials are `admin@doctortracker.local` / `ChangeMe123!` for ADMIN and `viewer@doctortracker.local` / `ViewMe123!` for VIEWER, unless overridden with `SEED_ADMIN_*` or `SEED_VIEWER_*` variables. No MongoDB migration is required.
+`npm start`, `npm run dev`, and Docker startup run the idempotent demo seeder before launching Express. Existing demo records are not replaced. Seeded demo credentials are `admin@doctortracker.local` / `ChangeMe123!` for ADMIN and `viewer@doctortracker.local` / `ViewMe123!` for VIEWER, unless overridden with `SEED_ADMIN_*` or `SEED_VIEWER_*` variables. No MongoDB migration is required.
 
 ## Environment
 
@@ -50,7 +50,7 @@ Create model, service, controller and routes files. Register the route prefix in
 
 ## Validation and security
 
-Use Fastify JSON schemas for body validation and `additionalProperties: false` to prevent mass assignment. Never accept `createdBy`, `updatedBy`, `role`, `actorId` or `passwordHash` from clients. Build ObjectIds and filters in services.
+Use Express validation middleware and `additionalProperties: false` to prevent mass assignment. Never accept `createdBy`, `updatedBy`, `role`, `actorId` or `passwordHash` from clients. Build ObjectIds and filters in services.
 
 ## Audit logging
 
@@ -66,7 +66,7 @@ Call `writeAudit` only after a successful business mutation. Store names, change
 
 ## Exceptions
 
-Controllers and service operations should catch or rethrow through Fastify's centralized handler. Throw `appError(statusCode, message, code, details)` for expected errors. Do not expose stack traces or internal database messages.
+Controllers and service operations should pass errors to Express's centralized error-handling middleware. Throw `appError(statusCode, message, code, details)` for expected errors. Do not expose stack traces or internal database messages.
 
 ## Git workflow
 

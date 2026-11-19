@@ -1,6 +1,68 @@
 # Doctor Tracker Backend
 
-Production-oriented Fastify REST API for the separate Next.js Doctor Tracker frontend.
+## Description
+
+Doctor Tracker is a secure, production-oriented REST API that enables separate Next.js frontend users to manage doctors, patients, dashboards, RBAC accounts, and immutable audit history. Built with Express.js and MongoDB/Mongoose, it emphasizes request validation, least-privilege authorization, bounded queries, aggregation performance, centralized error handling, and deployable observability for high-trust healthcare administration workflows.
+
+## Setup Guide
+
+### Prerequisites
+
+- Node.js 20 or newer
+- npm 10 or newer
+- MongoDB 7+ locally or MongoDB Atlas
+- Docker Desktop, optional
+
+### Local installation
+
+```bash
+cd backend
+npm install
+cp .env.example .env
+npm run seed:admin
+npm run dev
+```
+
+Configure `MONGODB_URI`, `JWT_SECRET`, `JWT_EXPIRES_IN`, `CLIENT_URL`, and `API_URL` in `.env`. MongoDB must be reachable before the server or seeders start.
+
+### Docker
+
+```bash
+docker compose up --build
+cd backend && npm run seed:admin
+```
+
+## System Architecture
+
+```mermaid
+flowchart LR
+  A[Next.js Frontend] --> B[Express REST API]
+  B --> C[Helmet, CORS, Rate Limiting]
+  C --> D[JWT Authentication]
+  D --> E[Role-Based Authorization]
+  E --> F[Validation Middleware]
+  F --> G[Controllers and Services]
+  G --> H[(MongoDB/Mongoose)]
+  G --> I[Aggregations and Indexed Collections]
+  G --> J[Immutable Audit Logs]
+```
+
+The frontend sends bearer-authenticated requests to Express route modules. Middleware verifies JWT and current-user state, authorization restricts ADMIN operations, validation protects request fields, services enforce business rules, and Mongoose performs CRUD, indexed search, aggregation, and audit writes against MongoDB.
+
+## Technical Decisions
+
+1. **MongoDB compound/text indexing and aggregation pipelines:** doctors and patients use text, compound, and foreign-key indexes for bounded search and filtering. Dashboard endpoints move count, grouping, lookup, sorting, and limiting work into MongoDB aggregation pipelines instead of loading entire collections into application memory.
+2. **Stateless JWT and Role-Based Access Control with immutable audit logging:** JWTs contain only subject and role, while every request reloads current user status and role. Mutations require appropriate roles and write immutable audit snapshots for security traceability; logout remains client-side token disposal rather than server-side token state.
+
+## Visual Evidence
+
+### Desktop Dashboard
+
+![Desktop Dashboard](./docs/screenshots/desktop-dashboard.png)
+
+### Mobile View
+
+![Mobile View](./docs/screenshots/mobile-view.png)
 
 ## Features
 
@@ -13,22 +75,6 @@ Production-oriented Fastify REST API for the separate Next.js Doctor Tracker fro
 - Swagger/OpenAPI documentation
 - CORS, Helmet, rate limiting and centralized validation/errors
 - Docker and Docker Compose support
-
-## Prerequisites
-
-- Node.js 20+
-- MongoDB 7+ (local or Atlas)
-- Docker Desktop optional
-
-## Installation
-
-```bash
-cd backend
-npm install
-cp .env.example .env
-npm run seed:admin
-npm run dev
-```
 
 ## API documentation
 
@@ -64,35 +110,6 @@ npm run seed:admin
 
 MongoDB must be reachable before the backend or seeder starts.
 
-## Docker
-
-From the repository root:
-
-```bash
-docker compose up --build
-```
-
-Set `JWT_SECRET` and `CLIENT_URL` in a local `.env` or shell for non-demo use.
-
-## API overview
-
-| Method | Endpoint | Access |
-|---|---|---|
-| POST | `/api/auth/login` | Public |
-| POST | `/api/auth/logout` | Authenticated |
-| GET | `/api/auth/me` | Authenticated |
-| GET/POST | `/api/users` | ADMIN |
-| GET/PUT/DELETE | `/api/users/:id` | ADMIN |
-| GET/POST | `/api/doctors` | Protected / ADMIN create |
-| GET/PUT/DELETE | `/api/doctors/:id` | Protected / ADMIN mutations |
-| GET/POST | `/api/doctors/:id/patients` | Protected / ADMIN create |
-| GET/POST | `/api/patients` | Protected / ADMIN create |
-| GET/PUT/DELETE | `/api/patients/:id` | Protected / ADMIN mutations |
-| GET | `/api/dashboard/stats` | ADMIN |
-| GET | `/api/audit-logs` | ADMIN |
-| GET | `/api/audit-logs/:id` | ADMIN |
-| GET | `/api/health` | Public |
-
 ## Render deployment
 
 Use the repository root `render.yaml` Blueprint:
@@ -102,7 +119,7 @@ Use the repository root `render.yaml` Blueprint:
 3. Set `MONGODB_URI` to the MongoDB Atlas connection string.
 4. Set `CLIENT_URL` to the exact Next.js frontend origin.
 5. Set `SEED_ADMIN_PASSWORD` to a strong demo password.
-6. Deploy. Render builds `backend/Dockerfile` and runs the demo seeder before Fastify starts.
+6. Deploy. Render builds `backend/Dockerfile` and runs the demo seeder before Express starts.
 
 Required variables:
 

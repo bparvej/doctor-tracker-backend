@@ -1,9 +1,11 @@
-const fp = require('fastify-plugin');
+const jwt = require('jsonwebtoken');
 
-async function jwtPlugin(fastify, options) {
-  await fastify.register(require('@fastify/jwt'), {
-    secret: options.secret,
-    sign: { expiresIn: options.expiresIn }
-  });
+function signToken(payload, secret, expiresIn) {
+  return jwt.sign(payload, secret, { expiresIn });
 }
-module.exports = fp(jwtPlugin);
+
+function verifyToken(token, secret) {
+  return jwt.verify(token, secret);
+}
+
+module.exports = { signToken, verifyToken };
