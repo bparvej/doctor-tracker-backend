@@ -36,6 +36,22 @@ async function run() {
     console.log(`Demo admin already exists: ${adminEmail}`);
   }
 
+  const viewerEmail = (process.env.SEED_VIEWER_EMAIL || 'viewer@doctortracker.local').trim().toLowerCase();
+  const existingViewer = await User.findOne({ email: viewerEmail });
+  if (!existingViewer) {
+    const viewerPasswordHash = await authService.hashPassword(process.env.SEED_VIEWER_PASSWORD || 'ViewMe123!');
+    await User.create({
+      name: process.env.SEED_VIEWER_NAME || 'Demo Viewer',
+      email: viewerEmail,
+      passwordHash: viewerPasswordHash,
+      role: 'VIEWER',
+      isActive: true
+    });
+    console.log(`Created demo viewer: ${viewerEmail}`);
+  } else {
+    console.log(`Demo viewer already exists: ${viewerEmail}`);
+  }
+
   const seededDoctors = [];
   for (const data of doctors) {
     let doctor = await Doctor.findOne({ email: data.email });

@@ -54,4 +54,4 @@ The Fastify CORS plugin reads the exact allowed origins from `CLIENT_URL` and su
 
 ## Swagger documentation
 
-Swagger reads `API_URL` at application startup. This public API base controls the OpenAPI `servers` entry, allowing `/api/docs` to execute requests against the deployed backend. Local fallback is `http://localhost:<PORT>`; production deployment should set `API_URL=https://doctor-tracker-backend-gfj8.onrender.com/api`.
+Swagger reads `API_URL`, then `PUBLIC_API_URL`, then Render's `RENDER_EXTERNAL_URL` at application startup. This public API base controls the OpenAPI `servers` entry, allowing `/api/docs` to execute requests against the deployed backend. Local fallback is `http://localhost:<PORT>`; production deployment should set `API_URL=https://doctor-tracker-backend-gfj8.onrender.com/api`. No database migration is needed for the existing role enum or user-management fields.

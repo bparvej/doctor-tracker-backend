@@ -28,7 +28,7 @@ cd backend && npm run seed:admin
 
 Set seed credentials in `backend/.env` when not using compose.
 
-`npm start`, `npm run dev`, and Docker startup run the idempotent demo seeder before launching Fastify. Existing demo records are not replaced. Seeded demo credentials are `admin@doctortracker.local` / `ChangeMe123!` unless overridden with `SEED_ADMIN_*` variables.
+`npm start`, `npm run dev`, and Docker startup run the idempotent demo seeder before launching Fastify. Existing demo records are not replaced. Seeded demo credentials are `admin@doctortracker.local` / `ChangeMe123!` for ADMIN and `viewer@doctortracker.local` / `ViewMe123!` for VIEWER, unless overridden with `SEED_ADMIN_*` or `SEED_VIEWER_*` variables. No MongoDB migration is required.
 
 ## Environment
 

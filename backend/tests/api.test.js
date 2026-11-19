@@ -99,3 +99,17 @@ test('user management routes require authentication and ADMIN RBAC', async () =>
   assert.equal(response.statusCode, 401);
   await app.close();
 });
+
+test('Swagger falls back to Render external URL', async () => {
+  const app = buildApp({ env: {
+    NODE_ENV: 'production', PORT: 5000,
+    MONGODB_URI: 'mongodb://127.0.0.1:27017/doctor_tracker_test',
+    JWT_SECRET: 'test-secret-with-at-least-thirty-two-bytes',
+    JWT_EXPIRES_IN: '1h', CLIENT_URL: 'https://doctor-tracker-frontend-sandy.vercel.app',
+    RENDER_EXTERNAL_URL: 'https://doctor-tracker-backend-gfj8.onrender.com'
+  } });
+  const response = await app.inject({ method: 'GET', url: '/api/docs/json' });
+  assert.equal(response.statusCode, 200);
+  assert.equal(response.json().servers[0].url, 'https://doctor-tracker-backend-gfj8.onrender.com');
+  await app.close();
+});

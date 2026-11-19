@@ -29,3 +29,9 @@ services:
         value: admin@doctortracker.local
       - key: SEED_ADMIN_PASSWORD
         sync: false
+      - key: SEED_VIEWER_NAME
+        value: Demo Viewer
+      - key: SEED_VIEWER_EMAIL
+        value: viewer@doctortracker.local
+      - key: SEED_VIEWER_PASSWORD
+        sync: false
