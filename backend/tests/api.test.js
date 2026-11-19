@@ -42,3 +42,39 @@ test('audit route rejects unauthenticated access', async () => {
   assert.equal(response.statusCode, 401);
   await app.close();
 });
+
+test('CORS allows configured frontend origin for preflight', async () => {
+  const app = buildApp({ env: {
+    NODE_ENV: 'test', PORT: 5000,
+    MONGODB_URI: 'mongodb://127.0.0.1:27017/doctor_tracker_test',
+    JWT_SECRET: 'test-secret-with-at-least-thirty-two-bytes',
+    JWT_EXPIRES_IN: '1h',
+    CLIENT_URL: 'https://example.vercel.app, https://doctor-tracker-frontend-sandy.vercel.app'
+  } });
+  const response = await app.inject({
+    method: 'OPTIONS',
+    url: '/api/auth/login',
+    headers: {
+      origin: 'https://doctor-tracker-frontend-sandy.vercel.app',
+      'access-control-request-method': 'POST',
+      'access-control-request-headers': 'content-type,authorization'
+    }
+  });
+  assert.equal(response.statusCode, 204);
+  assert.equal(response.headers['access-control-allow-origin'], 'https://doctor-tracker-frontend-sandy.vercel.app');
+  await app.close();
+});
+
+test('CORS rejects origins outside the configured allowlist', async () => {
+  const app = appWithEnv();
+  const response = await app.inject({
+    method: 'OPTIONS',
+    url: '/api/auth/login',
+    headers: {
+      origin: 'https://untrusted.example',
+      'access-control-request-method': 'POST'
+    }
+  });
+  assert.equal(response.statusCode, 403);
+  await app.close();
+});

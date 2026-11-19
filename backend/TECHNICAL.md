@@ -47,3 +47,7 @@ The Fastify centralized handler maps validation, malformed ObjectIds, duplicate 
 ## Performance considerations
 
 Monitor text index cardinality and maintain compound indexes for common dashboard and audit filters. Consider cursor pagination for very large histories. Dashboard count and aggregation endpoints can use MongoDB and should be cached if traffic increases.
+
+## CORS integration
+
+The Fastify CORS plugin reads the exact allowed origins from `CLIENT_URL` and supports comma-separated origins. Production deployments must set an explicit origin and must not use a wildcard. Preflight `OPTIONS` requests are handled for `GET`, `POST`, `PUT`, `PATCH`, `DELETE`, and `OPTIONS`, with `Content-Type` and `Authorization` allowed headers. The backend route prefix is `/api`; frontend API bases should therefore end in `/api`, while service endpoints begin with resource paths such as `/auth/login` or `/doctors`.

@@ -108,20 +108,27 @@ Required variables:
 
 `MONGODB_URI` and `JWT_SECRET` must be set before deployment. A fresh manual Web Service will not receive variables from `render.yaml` unless the repository is deployed as a Blueprint or variables are entered in the service dashboard.
 
-In Render service **Environment** settings, add:
+## CORS configuration
+
+Set `CLIENT_URL` to the exact frontend origin(s), without a path:
 
 ```text
-MONGODB_URI=<MongoDB Atlas connection string>
-JWT_SECRET=<long random secret of at least 32 characters>
-CLIENT_URL=https://your-nextjs-site.example
-JWT_EXPIRES_IN=1d
-NODE_ENV=production
-SEED_ADMIN_PASSWORD=<strong unique demo password>
+CLIENT_URL=https://doctor-tracker-frontend-sandy.vercel.app
 ```
 
-Never commit real MongoDB credentials or JWT secrets. After adding or changing environment variables, use **Manual Deploy > Clear build cache & deploy** so the new startup environment is applied.
+For multiple deployments, use a comma-separated allowlist:
 
-Atlas must allow Render network access. Replace demo credentials and rotate `JWT_SECRET` before production use.
+```text
+CLIENT_URL=https://doctor-tracker-frontend-sandy.vercel.app,https://preview.example.vercel.app
+```
+
+Wildcards are not used in production. The API base URL for the frontend is:
+
+```text
+NEXT_PUBLIC_API_URL=https://doctor-tracker-backend-gfj8.onrender.com/api
+```
+
+Frontend service paths should exclude `/api`, for example `/auth/login`, `/doctors`, and `/patients`; the centralized client adds the `/api` prefix exactly once.
 
 ## Tests
 

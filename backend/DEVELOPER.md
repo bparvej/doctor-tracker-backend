@@ -79,3 +79,19 @@ Create a feature branch, keep commits focused, run `npm test`, inspect `git diff
 - `Origin not allowed`: add the exact frontend origin to `CLIENT_URL`; multiple origins may be comma-separated.
 - Duplicate key: email or unique field already exists.
 - Invalid ObjectId: verify IDs in the response, not frontend-generated values.
+
+## CORS and frontend integration
+
+Set `CLIENT_URL` to the exact deployed frontend origin:
+
+```text
+CLIENT_URL=https://doctor-tracker-frontend-sandy.vercel.app
+```
+
+Multiple origins may be separated by commas, for example:
+
+```text
+CLIENT_URL=https://doctor-tracker-frontend-sandy.vercel.app,http://localhost:3000
+```
+
+Do not use `*` for production CORS. Allowed methods are `GET`, `POST`, `PUT`, `PATCH`, `DELETE`, and `OPTIONS`; allowed headers are `Content-Type` and `Authorization`. The API base URL is `/api`, so request paths must include `/api` only once, such as `/api/auth/login`.
