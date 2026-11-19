@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: doctor-tracker-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 1d
+      - key: MONGODB_URI
+        sync: false
+      - key: CLIENT_URL
+        sync: false
+      - key: SEED_ADMIN_NAME
+        value: Demo Administrator
+      - key: SEED_ADMIN_EMAIL
+        value: admin@doctortracker.local
+      - key: SEED_ADMIN_PASSWORD
+        sync: false
