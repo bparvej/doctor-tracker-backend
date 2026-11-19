@@ -106,6 +106,21 @@ Required variables:
 - `CLIENT_URL`: exact frontend URL
 - `SEED_ADMIN_*`: demo account configuration
 
+`MONGODB_URI` and `JWT_SECRET` must be set before deployment. A fresh manual Web Service will not receive variables from `render.yaml` unless the repository is deployed as a Blueprint or variables are entered in the service dashboard.
+
+In Render service **Environment** settings, add:
+
+```text
+MONGODB_URI=<MongoDB Atlas connection string>
+JWT_SECRET=<long random secret of at least 32 characters>
+CLIENT_URL=https://your-nextjs-site.example
+JWT_EXPIRES_IN=1d
+NODE_ENV=production
+SEED_ADMIN_PASSWORD=<strong unique demo password>
+```
+
+Never commit real MongoDB credentials or JWT secrets. After adding or changing environment variables, use **Manual Deploy > Clear build cache & deploy** so the new startup environment is applied.
+
 Atlas must allow Render network access. Replace demo credentials and rotate `JWT_SECRET` before production use.
 
 ## Tests

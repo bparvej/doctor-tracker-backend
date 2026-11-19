@@ -10,6 +10,14 @@ function run(command, args) {
 }
 
 async function start() {
+  if (process.env.NODE_ENV === 'production') {
+    const missing = ['MONGODB_URI', 'JWT_SECRET', 'CLIENT_URL']
+      .filter((name) => !process.env[name]);
+    if (missing.length) {
+      throw new Error(`Render configuration missing: ${missing.join(', ')}. Set these environment variables in the Render service, then redeploy.`);
+    }
+  }
+
   await run(process.execPath, ['scripts/seed-demo.js']);
   const serverArgs = process.argv.includes('--watch') ? ['--watch', 'server.js'] : ['server.js'];
   await run(process.execPath, serverArgs);
