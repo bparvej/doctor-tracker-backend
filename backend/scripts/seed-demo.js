@@ -1,4 +1,6 @@
-require('dotenv').config();
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config();
+}
 const { connectDatabase, disconnectDatabase } = require('../src/config/database');
 const { loadEnv } = require('../src/config/env');
 const authService = require('../src/modules/auth/auth.service');

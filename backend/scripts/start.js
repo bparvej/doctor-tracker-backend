@@ -1,5 +1,8 @@
-require('dotenv').config();
 const { spawn } = require('node:child_process');
+
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config();
+}
 
 function run(command, args) {
   return new Promise((resolve, reject) => {
@@ -18,7 +21,14 @@ async function start() {
     }
   }
 
-  await run(process.execPath, ['scripts/seed-demo.js']);
+  if (process.env.SEED_ON_START !== 'false') {
+    try {
+      await run(process.execPath, ['scripts/seed-demo.js']);
+    } catch (error) {
+      console.error(`Demo seeding was skipped: ${error.message}`);
+    }
+  }
+
   const serverArgs = process.argv.includes('--watch') ? ['--watch', 'server.js'] : ['server.js'];
   await run(process.execPath, serverArgs);
 }
