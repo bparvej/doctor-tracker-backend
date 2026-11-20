@@ -1,6 +1,13 @@
 # Doctor Tracker Backend
 
+- **Repository:** https://github.com/bparvej/doctor-tracker-backend
+- **Live API:** https://doctor-tracker-backend-gfj8.onrender.com
+- **API documentation:** https://doctor-tracker-backend-gfj8.onrender.com/api/docs
+- **Frontend repository:** https://github.com/bparvej/doctor-tracker-frontend
+- **Frontend application:** https://doctor-tracker-frontend-sandy.vercel.app
+
 ## Description
+**Elevator pitch:**
 
 Doctor Tracker is a secure, production-oriented REST API that enables separate Next.js frontend users to manage doctors, patients, dashboards, RBAC accounts, and immutable audit history. Built with Express.js and MongoDB/Mongoose, it emphasizes request validation, least-privilege authorization, bounded queries, aggregation performance, centralized error handling, and deployable observability for high-trust healthcare administration workflows.
 
@@ -159,6 +166,43 @@ Frontend service paths should exclude `/api`, for example `/auth/login`, `/docto
 ```bash
 npm test
 ```
+
+The automated suite covers health endpoints, login validation, protected-route authentication, audit-route protection, CORS allowlisting and Swagger server configuration. Run the suite from the `backend` directory.
+
+## Backend submission checklist
+
+- [x] Express REST API with MongoDB/Mongoose
+- [x] JWT login, protected routes and database-backed role/status revalidation
+- [x] ADMIN/VIEWER authorization for mutation and administration routes
+- [x] Doctor and patient CRUD with server-side search, filters and pagination
+- [x] Dashboard aggregation and bounded recent-record queries
+- [x] MongoDB text, compound and foreign-key indexes
+- [x] Immutable audit-log model and ADMIN-only audit endpoints
+- [x] Request validation, CORS, Helmet, rate limiting and centralized errors
+- [x] Swagger/OpenAPI and health endpoints
+- [x] Docker, Docker Compose and Render deployment configuration
+- [x] Idempotent demo and administrator seed scripts
+- [x] Automated test suite: 10 passing tests
+
+### Live deployment verification
+
+Verified on the deployed Render API:
+
+- [x] Health endpoint: `200 OK`
+- [x] ADMIN login and `/auth/me`: `200 OK`
+- [x] VIEWER login and `/auth/me`: `200 OK`
+- [x] ADMIN doctor creation: `201 Created`
+- [x] VIEWER doctor and patient mutations: `403 Forbidden`
+- [x] VIEWER audit-log access: `403 Forbidden`
+- [x] ADMIN audit-log access: `200 OK`
+- [x] Deleting a doctor with one assigned patient: `409 Conflict` (`DOCTOR_HAS_PATIENTS`)
+- [x] Deleting the assigned patient: `200 OK`
+- [x] Deleting the doctor after patient removal: `200 OK`
+- [x] Swagger JSON: `200 OK`
+
+Temporary QA records were created during verification and cleaned up afterward.
+
+Before final submission, also verify pagination and CORS behavior through the deployed frontend using real browser sessions.
 
 ## Environment variables
 
